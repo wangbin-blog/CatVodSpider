@@ -16,7 +16,7 @@ jobs:
         distribution: 'temurin'
         
     - name: Build with Gradle
-      run: cmd /c buildAndGenJar.bat ec
+      run: cmd /c build.bat ec
         
     - name: Update spider jar
       uses: EndBug/add-and-commit@v9
