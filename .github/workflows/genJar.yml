@@ -14,10 +14,9 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-        # 删除 cache: gradle 这一行，避免cache 400报错
         
     - name: Build with Gradle
-      run: ./buildAndGenJar.bat ec
+      run: cmd /c buildAndGenJar.bat ec
         
     - name: Update spider jar
       uses: EndBug/add-and-commit@v9
