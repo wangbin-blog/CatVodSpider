@@ -15,7 +15,7 @@ public class MacCms extends Spider {
     private boolean filterLoaded = false;
 
     @Override
-    public void init(Context context, String extend) {
+    public void init(Context context, String extend) throws Exception{
         super.init(context, extend);
         baseApi = extend;
         if (baseApi == null || baseApi.isEmpty()) {
