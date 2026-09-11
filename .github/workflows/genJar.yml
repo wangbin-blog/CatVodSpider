@@ -4,24 +4,26 @@ on: workflow_dispatch
 
 jobs:
   build:
-
     runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+
     - name: set up JDK 11
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v5
       with:
         java-version: '11'
-        distribution: 'adopt'
-        cache: gradle
+        distribution: 'temurin'
+        # 删除 cache: gradle 这一行，避免cache 400报错
         
     - name: Build with Gradle
       run: ./buildAndGenJar.bat ec
         
     - name: Update spider jar
-      uses: EndBug/add-and-commit@v7
+      uses: EndBug/add-and-commit@v9
       with:
         default_author: github_actions
         message: 'update spider jar'
-        add: "['./jar/custom_spider.jar', './jar/custom_spider.jar.md5']"
+        add: |
+          ./jar/custom_spider.jar
+          ./jar/custom_spider.jar.md5
