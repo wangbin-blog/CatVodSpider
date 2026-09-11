@@ -15,7 +15,7 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: Build with Gradle
+    - name: Build Spider Jar
       run: cmd /c build.bat jar
         
     - name: Update spider jar
