@@ -113,7 +113,7 @@ public class Dyttzy extends Spider {
         for (Net.Result response : net.batch(requests.toString())) {
             if (response.error != null) throw new IllegalStateException(response.error);
             if ((Integer) response.code < 200 || (Integer) response.code >= 300) throw new IllegalStateException("HTTP " + response.code);
-            JSONObject json = new JSONObject(String.valueOf(response.content));
+            JSONObject json = new JSONObject(String.valueOf(response.body));
             JSONArray list = json.optJSONArray("list");
             for (int i = 0; list != null && i < list.length(); i++) items.put(card(list.getJSONObject(i)));
             pagecount = Math.max(pagecount, json.optInt("pagecount", 1));
