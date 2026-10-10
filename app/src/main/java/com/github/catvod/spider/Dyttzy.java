@@ -86,44 +86,44 @@ public class Dyttzy extends Spider {
         return new JSONObject().put("list", cards(json.optJSONArray("list"))).toString();
     }
 
-    @Override
-    public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        String sub = extend == null ? null : extend.get("t");
-        boolean all = sub == null || sub.isEmpty() || sub.equals("all");
-        JSONArray subs;
-        if (!all) subs = new JSONArray().put(sub);
-        else {
-            subs = subIds(tid);
-            // 无二级配置时把 tid 当作二级分类直接请求
-            if (subs == null || subs.length() == 0) subs = new JSONArray().put(tid);
-        }
-        if (subs.length() == 1) {
-            JSONObject json = request(listParams(subs.getString(0), pg, extend));
-            return page(json, pg).toString();
-        }
-        // 未选二级分类：并行请求该一级下所有二级，合并当页（接口不支持一次查多个 t）
-        JSONArray requests = new JSONArray();
-        for (int i = 0; i < subs.length(); i++) {
-            requests.put(new JSONObject().put("url", api).put("options", new JSONObject().put("params", listParams(subs.getString(i), pg, extend))));
-        }
-        JSONArray items = new JSONArray();
-        int pagecount = 1;
-        long total = 0;
-        boolean hasTotal = true;
-        for (Net.Result response : net.batch(requests.toString())) {
-            if (response.error != null) throw new IllegalStateException(response.error);
-            if ((Integer) response.code < 200 || (Integer) response.code >= 300) throw new IllegalStateException("HTTP " + response.code);
-            JSONObject json = new JSONObject(String.valueOf(response.body));
-            JSONArray list = json.optJSONArray("list");
-            for (int i = 0; list != null && i < list.length(); i++) items.put(card(list.getJSONObject(i)));
-            pagecount = Math.max(pagecount, json.optInt("pagecount", 1));
-            if (json.has("total")) total += json.optLong("total");
-            else hasTotal = false;
-        }
-        JSONObject result = new JSONObject().put("list", items).put("page", parseInt(pg, 1)).put("pagecount", pagecount).put("limit", items.length());
-        if (hasTotal) result.put("total", total);
-        return result.toString();
+   @Override
+public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
+    String sub = extend == null ? null : extend.get("t");
+    boolean all = sub == null || sub.isEmpty() || sub.equals("all");
+    JSONArray subs;
+    if (!all) subs = new JSONArray().put(sub);
+    else {
+        subs = subIds(tid);
+        // 无二级配置时把 tid 当作二级分类直接请求
+        if (subs == null || subs.length() == 0) subs = new JSONArray().put(tid);
     }
+    if (subs.length() == 1) {
+        JSONObject json = request(listParams(subs.getString(0), pg, extend));
+        return page(json, pg).toString();
+    }
+    // 未选二级分类：并行请求该一级下所有二级，合并当页（接口不支持一次查多个 t）
+    JSONArray requests = new JSONArray();
+    for (int i = 0; i < subs.length(); i++) {
+        requests.put(new JSONObject().put("url", api).put("options", new JSONObject().put("params", listParams(subs.getString(i), pg, extend))));
+    }
+    JSONArray items = new JSONArray();
+    int pagecount = 1;
+    long total = 0;
+    boolean hasTotal = true;
+    for (Net.Result response : net.batch(requests.toString())) {
+        if (response.error != null) throw new IllegalStateException(response.error);
+        if ((Integer) response.code < 200 || (Integer) response.code >= 300) throw new IllegalStateException("HTTP " + response.code);
+        JSONObject json = new JSONObject(response.body);
+        JSONArray list = json.optJSONArray("list");
+        for (int i = 0; list != null && i < list.length(); i++) items.put(card(list.getJSONObject(i)));
+        pagecount = Math.max(pagecount, json.optInt("pagecount", 1));
+        if (json.has("total")) total += json.optLong("total");
+        else hasTotal = false;
+    }
+    JSONObject result = new JSONObject().put("list", items).put("page", parseInt(pg, 1)).put("pagecount", pagecount).put("limit", items.length());
+    if (hasTotal) result.put("total", total);
+    return result.toString();
+}
 
     /** 列表请求参数：t + 页码，并透传 class/area/year 筛选值 */
     private JSONObject listParams(String t, String pg, HashMap<String, String> extend) throws Exception {
@@ -215,7 +215,7 @@ public class Dyttzy extends Spider {
         return result;
     }
 
-    private void putPaging(JSONObject result, JSONObject json, String pg) {
+    private void putPaging(JSONObject result, JSONObject json, String pg) throws Exception {
         int page = json.optInt("page", parseInt(pg, 1));
         int pagecount = json.optInt("pagecount", page);
         int limit = parseInt(json.optString("limit", "20"), 20);
