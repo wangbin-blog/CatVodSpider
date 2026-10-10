@@ -1,0 +1,29 @@
+name: Spider Jar Gen CI
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    # =========新增权限配置=========
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: set up JDK 11
+      uses: actions/setup-java@v5
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: Build Spider Jar
+      run: cmd /c build.bat jar
+        
+    - name: Update spider jar
+      uses: EndBug/add-and-commit@v9
+      with:
+        default_author: github_actions
+        message: 'update spider jar'
+        add: ./jar/custom_spider.jar
